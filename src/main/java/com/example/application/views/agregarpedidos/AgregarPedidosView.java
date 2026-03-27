@@ -1,7 +1,7 @@
 package com.example.application.views.agregarpedidos;
 
-import com.example.application.data.SamplePerson;
-import com.example.application.services.SamplePersonService;
+import com.example.application.data.Pedidos;
+import com.example.application.services.PedidosService;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -27,7 +27,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Agregar Pedidos")
 @Route("Agregar-pedidos")
-@Menu(order = 4, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
+// @Menu(order = 4, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
 @Uses(Icon.class)
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
@@ -40,7 +40,7 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         Button buttonSecondary = new Button();
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button buttonPrimary = new Button();
-        Grid basicGrid = new Grid(SamplePerson.class);
+        Grid basicGrid = new Grid(Pedidos.class);
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -50,18 +50,24 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         layoutRow.getStyle().set("flex-grow", "1");
         layoutRow.setAlignItems(Alignment.END);
         layoutRow.setJustifyContentMode(JustifyContentMode.START);
+
         textField.setLabel("Nombre del cliente");
         textField.setWidth("min-content");
+
         comboBox.setLabel("Prioridad");
         comboBox.setWidth("min-content");
-        setComboBoxSampleData(comboBox);
+        setPriority(comboBox);
+
         comboBox2.setLabel("Articulo");
         comboBox2.setWidth("min-content");
-        setComboBoxSampleData(comboBox2);
+        setArticulo(comboBox2);
+
         numberField.setLabel("Cantidad");
         numberField.setWidth("min-content");
+
         buttonSecondary.setText("Agregar");
         buttonSecondary.setWidth("min-content");
+
         layoutRow2.setHeightFull();
         layoutRow.setFlexGrow(1.0, layoutRow2);
         layoutRow2.addClassName(Gap.MEDIUM);
@@ -69,12 +75,15 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         layoutRow2.getStyle().set("flex-grow", "1");
         layoutRow2.setAlignItems(Alignment.START);
         layoutRow2.setJustifyContentMode(JustifyContentMode.END);
+
         buttonPrimary.setText("Finalizar pedido");
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
         basicGrid.setWidth("100%");
         basicGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(basicGrid);
+
         getContent().add(layoutRow);
         layoutRow.add(textField);
         layoutRow.add(comboBox);
@@ -89,20 +98,28 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
     record SampleItem(String value, String label, Boolean disabled) {
     }
 
-    private void setComboBoxSampleData(ComboBox comboBox) {
+    private void setPriority(ComboBox comboBox) {
         List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("first", "First", null));
-        sampleItems.add(new SampleItem("second", "Second", null));
-        sampleItems.add(new SampleItem("third", "Third", Boolean.TRUE));
-        sampleItems.add(new SampleItem("fourth", "Fourth", null));
+        sampleItems.add(new SampleItem("Urgente", "Urgente", null));
+        sampleItems.add(new SampleItem("Normal", "Normal", null));
+        sampleItems.add(new SampleItem("Baja", "Baja", null));
         comboBox.setItems(sampleItems);
         comboBox.setItemLabelGenerator(item -> ((SampleItem) item).label());
     }
 
+    private void setArticulo(ComboBox comboBox2) {
+        List<SampleItem> sampleItems = new ArrayList<>();
+        sampleItems.add(new SampleItem("Leche", "Leche", null));
+        sampleItems.add(new SampleItem("Pan", "Pan", null));
+        sampleItems.add(new SampleItem("Huevos", "Huevos", null));
+        comboBox2.setItems(sampleItems);
+        comboBox2.setItemLabelGenerator(item -> ((SampleItem) item).label());
+    }
+
     private void setGridSampleData(Grid grid) {
-        grid.setItems(query -> samplePersonService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
+        grid.setItems(query -> pedidosService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
     }
 
     @Autowired()
-    private SamplePersonService samplePersonService;
+    private PedidosService pedidosService;
 }

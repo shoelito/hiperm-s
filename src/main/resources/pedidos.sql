@@ -1,0 +1,1 @@
+insert into pedidos(id,cliente,articulo,cantidad,prioridad,estado) values (1, 'Juan','Leche','2','Urgente','Pendiente')

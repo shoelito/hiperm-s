@@ -4,6 +4,9 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.UI;
+import com.example.application.views.inventario.InventarioView;
+import com.example.application.views.pedidos.PedidosView;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -28,8 +31,29 @@ public class InicioView extends Composite<VerticalLayout> {
         buttonPrimary.setText("Ver inventario");
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        buttonPrimary.addClickListener(event -> {
+            UI.getCurrent().navigate(InventarioView.class);
+        });
+
+        Button buttonPedidos = new Button();
+        getContent().setWidth("100%");
+        getContent().getStyle().set("flex-grow", "1");
+        layoutColumn2.setWidth("100%");
+        layoutColumn2.getStyle().set("flex-grow", "1");
+        h1.setText("Bienvenido a HIPERmás");
+        h1.setWidth("max-content");
+        buttonPedidos.setText("Ver pedidos");
+        buttonPedidos.setWidth("min-content");
+        buttonPedidos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        buttonPedidos.addClickListener(event -> {
+            UI.getCurrent().navigate(PedidosView.class);
+        });
+
         getContent().add(layoutColumn2);
         layoutColumn2.add(h1);
+        layoutColumn2.add(buttonPedidos);
         layoutColumn2.add(buttonPrimary);
     }
 }

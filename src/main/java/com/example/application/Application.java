@@ -1,6 +1,6 @@
 package com.example.application;
 
-import com.example.application.data.SamplePersonRepository;
+import com.example.application.data.PedidosRepository;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
@@ -30,9 +30,10 @@ public class Application implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
+
     @Bean
     ApplicationDataSourceScriptDatabaseInitializer customInitializer(DataSource dataSource,
-            SqlInitializationProperties properties, SamplePersonRepository repository) {
+            SqlInitializationProperties properties, PedidosRepository repository) {
         // Only run schema.sql/data.sql when the DB is empty
         return new ApplicationDataSourceScriptDatabaseInitializer(dataSource, properties) {
             @Override

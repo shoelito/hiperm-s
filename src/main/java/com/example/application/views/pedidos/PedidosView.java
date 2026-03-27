@@ -1,8 +1,10 @@
 package com.example.application.views.pedidos;
 
-import com.example.application.data.SamplePerson;
-import com.example.application.services.SamplePersonService;
+import com.example.application.views.agregarpedidos.AgregarPedidosView;
+import com.example.application.data.Pedidos;
+import com.example.application.services.PedidosService;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
@@ -28,7 +30,7 @@ public class PedidosView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
-        Grid basicGrid = new Grid(SamplePerson.class);
+        Grid basicGrid = new Grid(Pedidos.class);
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -39,6 +41,11 @@ public class PedidosView extends Composite<VerticalLayout> {
         buttonPrimary.setText("Agregar pedido");
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        buttonPrimary.addClickListener(event -> {
+            UI.getCurrent().navigate(AgregarPedidosView.class);
+        });
+
         buttonSecondary.setText("Deshacer ultimo pedido");
         buttonSecondary.setWidth("min-content");
         basicGrid.setWidth("100%");
@@ -51,9 +58,9 @@ public class PedidosView extends Composite<VerticalLayout> {
     }
 
     private void setGridSampleData(Grid grid) {
-        grid.setItems(query -> samplePersonService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
+        grid.setItems(query -> pedidosService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
     }
 
     @Autowired()
-    private SamplePersonService samplePersonService;
+    private PedidosService pedidosService;
 }

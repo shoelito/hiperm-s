@@ -1,7 +1,7 @@
 package com.example.application.views.inventario;
 
-import com.example.application.data.SamplePerson;
-import com.example.application.services.SamplePersonService;
+import com.example.application.data.Pedidos;
+import com.example.application.services.PedidosService;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -39,7 +39,7 @@ public class InventarioView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRow4 = new HorizontalLayout();
         HorizontalLayout layoutRow5 = new HorizontalLayout();
         VerticalLayout layoutColumn4 = new VerticalLayout();
-        Grid basicGrid = new Grid(SamplePerson.class);
+        Grid basicGrid = new Grid(Pedidos.class);
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -112,9 +112,9 @@ public class InventarioView extends Composite<VerticalLayout> {
     }
 
     private void setGridSampleData(Grid grid) {
-        grid.setItems(query -> samplePersonService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
+        grid.setItems(query -> pedidosService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
     }
 
     @Autowired()
-    private SamplePersonService samplePersonService;
+    private PedidosService pedidosService;
 }

@@ -23,7 +23,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Agregar Producto")
 @Route("Agregar-producto")
-@Menu(order = 3, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
+// @Menu(order = 3, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
 public class AgregarProductoView extends Composite<VerticalLayout> {
 
     public AgregarProductoView() {
