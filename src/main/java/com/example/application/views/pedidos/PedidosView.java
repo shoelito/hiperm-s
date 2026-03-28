@@ -11,6 +11,8 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -27,9 +29,11 @@ public class PedidosView extends Composite<VerticalLayout> {
 
     private final PedidosService pedidosService;
 
+    @SuppressWarnings("unused")
     public PedidosView(PedidosService pedidosService) {
         this.pedidosService = pedidosService;
 
+        Grid<Pedidos> gridPedidos = new Grid<>();
         HorizontalLayout layoutRow = new HorizontalLayout();
         layoutRow.setWidthFull();
         getContent().setFlexGrow(1.0, layoutRow);
@@ -38,25 +42,53 @@ public class PedidosView extends Composite<VerticalLayout> {
         layoutRow.getStyle().set("flex-grow", "1");
         getContent().add(layoutRow);
 
-        Button buttonPrimary = new Button();
-        buttonPrimary.setText("Agregar pedido");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        buttonPrimary.addClickListener(event -> {
+        // Boton para agregar un nuevo pedido
+        Button btnAgregar = new Button();
+        btnAgregar.setText("Agregar pedido");
+        btnAgregar.setWidth("min-content");
+        btnAgregar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnAgregar.addClickListener(event -> {
             UI.getCurrent().navigate(AgregarPedidosView.class);
         });
+        // fin boton agregar
 
-        Button buttonSecondary = new Button();
-        buttonSecondary.setText("Deshacer ultimo pedido");
-        buttonSecondary.setWidth("min-content");
+        // Boton para deshacer el ultimo pedido
+        Button btnDeshacer = new Button();
+        btnDeshacer.setText("Deshacer ultimo pedido");
+        btnDeshacer.setWidth("min-content");
+        btnDeshacer.addClickListener(event -> {
+            boolean exito = pedidosService.deshacerUltimoAtendido();
+            if (exito) {
+                Notification.show("Se deshizo la entrega del último pedido.");
+                gridPedidos.setItems(pedidosService.obtenerPedidosGrid());
+            } else {
+                Notification.show("No hay historial de pedidos para deshacer.");
+            }
+        });
+        // fin boton deshacer
 
-        // Crear grid
-        Grid<Pedidos> gridPedidos = new Grid<>();
+        // Boton para atender el siguiente pedido
+        Button btnAtender = new Button();
+        btnAtender.setText("Despachar pedido");
+        btnAtender.setWidth("min-content");
+        btnAtender.addClickListener(event -> {
+            Pedidos atendido = pedidosService.atenderSiguiente();
+            if (atendido != null) {
+                Notification.show("Pedido #" + atendido.getId() + " completado.");
+                gridPedidos.setItems(pedidosService.obtenerPedidosGrid());
+            } else {
+                Notification.show("No hay pedidos pendientes.");
+            }
+        });
 
-        gridPedidos.addColumn(Pedidos::getId).setHeader("ID").setSortable(true);
+        btnAtender.addClickListener(event -> {
+            pedidosService.atenderSiguiente();
+            setGridData(gridPedidos);
+        });
+        // fin boton atender
+
+        // Grid de pedidos
         gridPedidos.addColumn(Pedidos::getCliente).setHeader("Cliente");
-
         gridPedidos.addComponentColumn(pedido -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.getStyle().set("flex-wrap", "wrap");
@@ -81,16 +113,18 @@ public class PedidosView extends Composite<VerticalLayout> {
         gridPedidos.setWidth("100%");
         gridPedidos.getStyle().set("flex-grow", "0");
         setGridData(gridPedidos);
+        // fin grid de pedidos
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
 
-        layoutRow.add(buttonPrimary);
-        layoutRow.add(buttonSecondary);
+        layoutRow.add(btnAgregar);
+        layoutRow.add(btnDeshacer);
+        layoutRow.add(btnAtender);
         getContent().add(gridPedidos);
     }
 
     private void setGridData(Grid<Pedidos> gridPedidos) {
-        gridPedidos.setItems(pedidosService.findAll());
+        gridPedidos.setItems(pedidosService.obtenerPedidosGrid());
     }
 }
