@@ -3,9 +3,6 @@ package com.example.application.data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface PedidosRepository
-        extends
-        JpaRepository<Pedidos, Long>,
-        JpaSpecificationExecutor<Pedidos> {
+public interface PedidosRepository extends JpaRepository<Pedidos, Long>, JpaSpecificationExecutor<Pedidos> {
 
 }

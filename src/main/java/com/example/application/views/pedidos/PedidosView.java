@@ -19,6 +19,7 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+import java.util.Objects;
 
 @PageTitle("Pedidos")
 @Route("Pedidos")
@@ -30,7 +31,9 @@ public class PedidosView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
-        Grid basicGrid = new Grid(Pedidos.class);
+
+        Grid<Pedidos> gridPedidos = new Grid<>(Pedidos.class);
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -48,17 +51,20 @@ public class PedidosView extends Composite<VerticalLayout> {
 
         buttonSecondary.setText("Deshacer ultimo pedido");
         buttonSecondary.setWidth("min-content");
-        basicGrid.setWidth("100%");
-        basicGrid.getStyle().set("flex-grow", "0");
-        setGridSampleData(basicGrid);
+
+        gridPedidos.setWidth("100%");
+        gridPedidos.getStyle().set("flex-grow", "0");
+        setGridSampleData(gridPedidos);
+
         getContent().add(layoutRow);
         layoutRow.add(buttonPrimary);
         layoutRow.add(buttonSecondary);
-        getContent().add(basicGrid);
+        getContent().add(gridPedidos);
     }
 
-    private void setGridSampleData(Grid grid) {
-        grid.setItems(query -> pedidosService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
+    private void setGridSampleData(Grid<Pedidos> gridPedidos) {
+        gridPedidos.setItems(query -> pedidosService.list(
+                Objects.requireNonNull(VaadinSpringDataHelpers.toSpringPageRequest(query))).stream());
     }
 
     @Autowired()
