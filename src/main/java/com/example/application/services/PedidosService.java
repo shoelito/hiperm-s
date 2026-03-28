@@ -1,14 +1,13 @@
 package com.example.application.services;
 
 import com.example.application.data.Pedidos;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +33,7 @@ public class PedidosService {
             try {
                 pedidosCache = objectMapper.readValue(archivoJson, new TypeReference<List<Pedidos>>() {
                 });
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
@@ -46,7 +45,7 @@ public class PedidosService {
     private void guardarDatos() {
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, pedidosCache);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
