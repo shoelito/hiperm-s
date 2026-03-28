@@ -1,1 +1,34 @@
-[ ]
+[
+    {
+        "id": 1,
+        "cliente": "Juan",
+        "articulos": {
+            "Leche": 2
+        },
+        "prioridad": "Urgente",
+        "estado": "Pendiente"
+    },
+    {
+        "id": 2,
+        "cliente": "Maria",
+        "articulos": {
+            "Pan": 1
+        },
+        "prioridad": "Normal",
+        "estado": "Completado"
+    },
+    {
+        "id": 3,
+        "cliente": "Pedro",
+        "articulos": {
+            "Queso": 3,
+            "Jamon": 2,
+            "Pan": 1,
+            "Leche": 2,
+            "Huevos": 12,
+            "Carne": 1
+        },
+        "prioridad": "Urgente",
+        "estado": "Pendiente"
+    }
+]
