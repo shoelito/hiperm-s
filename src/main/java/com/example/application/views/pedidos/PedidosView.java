@@ -12,7 +12,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -33,6 +32,7 @@ public class PedidosView extends Composite<VerticalLayout> {
     public PedidosView(PedidosService pedidosService) {
         this.pedidosService = pedidosService;
 
+        Span indicador = new Span();
         Grid<Pedidos> gridPedidos = new Grid<>();
         HorizontalLayout layoutRow = new HorizontalLayout();
         layoutRow.setWidthFull();
@@ -54,7 +54,7 @@ public class PedidosView extends Composite<VerticalLayout> {
 
         // Boton para deshacer el ultimo pedido
         Button btnDeshacer = new Button();
-        btnDeshacer.setText("Deshacer ultimo pedido");
+        btnDeshacer.setText("Deshacer ultimo despacho");
         btnDeshacer.setWidth("min-content");
         btnDeshacer.addClickListener(event -> {
             boolean exito = pedidosService.deshacerUltimoAtendido();
@@ -79,11 +79,6 @@ public class PedidosView extends Composite<VerticalLayout> {
             } else {
                 Notification.show("No hay pedidos pendientes.");
             }
-        });
-
-        btnAtender.addClickListener(event -> {
-            pedidosService.atenderSiguiente();
-            setGridData(gridPedidos);
         });
         // fin boton atender
 
@@ -115,12 +110,17 @@ public class PedidosView extends Composite<VerticalLayout> {
         setGridData(gridPedidos);
         // fin grid de pedidos
 
+        indicador.setText("Se despachará según el orden mostrado");
+        indicador.setWidth("100%");
+        indicador.getElement().getThemeList().add("badge");
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
 
         layoutRow.add(btnAgregar);
-        layoutRow.add(btnDeshacer);
         layoutRow.add(btnAtender);
+        layoutRow.add(btnDeshacer);
+        getContent().add(indicador);
         getContent().add(gridPedidos);
     }
 
