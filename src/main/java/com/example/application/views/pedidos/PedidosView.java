@@ -32,7 +32,23 @@ public class PedidosView extends Composite<VerticalLayout> {
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
 
-        Grid<Pedidos> gridPedidos = new Grid<>(Pedidos.class);
+        // Crear grid
+        Grid<Pedidos> gridPedidos = new Grid<>();
+        gridPedidos.addColumn(Pedidos::getId).setHeader("ID").setSortable(true);
+        gridPedidos.addColumn(Pedidos::getCliente).setHeader("Cliente");
+
+        // Si el json no tiene articulos, mostrar "Sin artículos"
+        gridPedidos.addColumn(pedido -> {
+            if (pedido.getArticulos() == null || pedido.getArticulos().isEmpty())
+                return "Sin artículos";
+            StringBuilder resumen = new StringBuilder();
+            pedido.getArticulos().forEach(
+                    (articulo, cantidad) -> resumen.append(articulo).append(": ").append(cantidad).append(", "));
+            return resumen.substring(0, resumen.length() - 2);
+        }).setHeader("Artículos");
+
+        gridPedidos.addColumn(Pedidos::getPrioridad).setHeader("Prioridad");
+        gridPedidos.addColumn(Pedidos::getEstado).setHeader("Estado");
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -63,8 +79,7 @@ public class PedidosView extends Composite<VerticalLayout> {
     }
 
     private void setGridSampleData(Grid<Pedidos> gridPedidos) {
-        gridPedidos.setItems(query -> pedidosService.list(
-                Objects.requireNonNull(VaadinSpringDataHelpers.toSpringPageRequest(query))).stream());
+        gridPedidos.setItems(pedidosService.findAll());
     }
 
     @Autowired()

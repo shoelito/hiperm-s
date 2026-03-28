@@ -1,15 +1,26 @@
 package com.example.application.data;
 
-import jakarta.persistence.Entity;
+import java.util.HashMap;
+import java.util.Map;
 
-@Entity
-public class Pedidos extends AbstractEntity {
+public class Pedidos {
 
+    private Long id;
     private String cliente;
-    private String articulo;
-    private String cantidad;
+
+    // Articulo: cantidad
+    private Map<String, Integer> articulos = new HashMap<>();
     private String prioridad;
     private String estado;
+
+    // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getCliente() {
         return cliente;
@@ -19,20 +30,12 @@ public class Pedidos extends AbstractEntity {
         this.cliente = cliente;
     }
 
-    public String getArticulo() {
-        return articulo;
+    public Map<String, Integer> getArticulos() {
+        return articulos;
     }
 
-    public void setArticulo(String articulo) {
-        this.articulo = articulo;
-    }
-
-    public String getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(String cantidad) {
-        this.cantidad = cantidad;
+    public void setArticulos(Map<String, Integer> articulos) {
+        this.articulos = articulos;
     }
 
     public String getPrioridad() {
@@ -50,5 +53,4 @@ public class Pedidos extends AbstractEntity {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-
 }

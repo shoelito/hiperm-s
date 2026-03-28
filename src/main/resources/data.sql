@@ -1,0 +1,5 @@
+insert into pedidos(version, id, cliente, articulo, cantidad, prioridad, estado) values (1, 1, 'Juan','{Leche{1},Pan{2},Queso{3},Jamon{4},Yogurt{5}}','2','Urgente','Pendiente');
+insert into pedidos(version, id, cliente, articulo, cantidad, prioridad, estado) values (1, 2, 'Maria','{Pan{1},Queso{2},Jamon{3},Yogurt{4}}','1','Normal','Pendiente');
+insert into pedidos(version, id, cliente, articulo, cantidad, prioridad, estado) values (1, 3, 'Pedro','{Queso{1},Jamon{2},Yogurt{3}}','3','Urgente','Pendiente');
+insert into pedidos(version, id, cliente, articulo, cantidad, prioridad, estado) values (1, 4, 'Ana','{Jamon{1},Yogurt{2}}','2','Normal','Pendiente');
+insert into pedidos(version, id, cliente, articulo, cantidad, prioridad, estado) values (1, 5, 'Luis','{Yogurt{1}}','4','Normal','Pendiente');
