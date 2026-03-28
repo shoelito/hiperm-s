@@ -117,8 +117,7 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
     }
 
     private void setGridSampleData(Grid grid) {
-        // grid.setItems(query ->
-        // pedidosService.list(VaadinSpringDataHelpers.toSpringPageRequest(query)).stream());
+
     }
 
     @Autowired()
