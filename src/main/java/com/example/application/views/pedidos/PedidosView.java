@@ -108,8 +108,8 @@ public class PedidosView extends Composite<VerticalLayout> {
             return layout;
         }).setHeader("Artículos").setAutoWidth(true).setFlexGrow(1);
 
-        gridPedidos.addColumn(Pedidos::getPrioridad).setHeader("Prioridad").setSortable(true);
-        gridPedidos.addColumn(Pedidos::getEstado).setHeader("Estado").setSortable(true);
+        gridPedidos.addColumn(Pedidos::getPrioridad).setHeader("Prioridad");
+        gridPedidos.addColumn(Pedidos::getEstado).setHeader("Estado");
         gridPedidos.setWidth("100%");
         gridPedidos.getStyle().set("flex-grow", "0");
         setGridData(gridPedidos);

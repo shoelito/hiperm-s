@@ -1,25 +1,23 @@
 [
     {
-        "id": 1,
-        "cliente": "Juan",
-        "articulos": {
-            "Leche": 2
-        },
-        "prioridad": "Urgente",
-        "estado": "Pendiente"
-    },
-    {
-        "id": 2,
-        "cliente": "Maria",
         "articulos": {
             "Pan": 1
         },
-        "prioridad": "Normal",
-        "estado": "Completado"
+        "cliente": "Maria",
+        "estado": "Pendiente",
+        "id": 2,
+        "prioridad": "Normal"
     },
     {
-        "id": 3,
-        "cliente": "Pedro",
+        "articulos": {
+            "Leche": 2
+        },
+        "cliente": "Juan",
+        "estado": "Pendiente",
+        "id": 1,
+        "prioridad": "Urgente"
+    },
+    {
         "articulos": {
             "Queso": 3,
             "Jamon": 2,
@@ -28,7 +26,9 @@
             "Huevos": 12,
             "Carne": 1
         },
-        "prioridad": "Urgente",
-        "estado": "Pendiente"
+        "cliente": "Pedro",
+        "estado": "Pendiente",
+        "id": 3,
+        "prioridad": "Urgente"
     }
 ]
