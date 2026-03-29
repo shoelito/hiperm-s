@@ -48,7 +48,7 @@ public class PedidosView extends Composite<VerticalLayout> {
         btnAgregar.setWidth("min-content");
         btnAgregar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnAgregar.addClickListener(event -> {
-            UI.getCurrent().navigate(AgregarPedidosView.class);
+            UI.getCurrent().navigate("Pedidos/Agregar");
         });
         // fin boton agregar
 

@@ -23,7 +23,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle("Agregar Pedidos")
-@Route("Agregar-pedidos")
+@Route("Pedidos/Agregar")
 @Uses(Icon.class)
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
