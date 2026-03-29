@@ -20,10 +20,11 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.application.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle("Agregar Pedidos")
-@Route("Pedidos/Agregar")
+@Route(value = "Pedidos/Agregar", layout = MainLayout.class)
 @Uses(Icon.class)
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
