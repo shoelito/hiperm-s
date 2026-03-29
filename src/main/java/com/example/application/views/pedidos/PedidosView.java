@@ -1,6 +1,5 @@
 package com.example.application.views.pedidos;
 
-import com.example.application.views.agregarpedidos.AgregarPedidosView;
 import com.example.application.data.Pedidos;
 import com.example.application.services.PedidosService;
 import com.vaadin.flow.component.Composite;
@@ -74,7 +73,7 @@ public class PedidosView extends Composite<VerticalLayout> {
         btnAtender.addClickListener(event -> {
             Pedidos atendido = pedidosService.atenderSiguiente();
             if (atendido != null) {
-                Notification.show("Pedido #" + atendido.getId() + " completado.");
+                Notification.show("Pedido de " + atendido.getCliente() + " completado.");
                 gridPedidos.setItems(pedidosService.obtenerPedidosGrid());
             } else {
                 Notification.show("No hay pedidos pendientes.");

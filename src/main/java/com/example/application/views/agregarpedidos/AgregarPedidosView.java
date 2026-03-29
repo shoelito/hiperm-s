@@ -2,13 +2,16 @@ package com.example.application.views.agregarpedidos;
 
 import com.example.application.data.Pedidos;
 import com.example.application.services.PedidosService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -18,105 +21,146 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import java.util.ArrayList;
-import java.util.List;
-import com.example.application.views.MainLayout;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Map;
 
 @PageTitle("Agregar Pedidos")
 @Route(value = "Pedidos/Agregar", layout = MainLayout.class)
 @Uses(Icon.class)
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
-    public AgregarPedidosView() {
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        TextField textField = new TextField();
-        ComboBox comboBox = new ComboBox();
-        ComboBox comboBox2 = new ComboBox();
-        NumberField numberField = new NumberField();
-        Button buttonSecondary = new Button();
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button buttonPrimary = new Button();
-        Grid basicGrid = new Grid(Pedidos.class);
+    private final PedidosService pedidosService;
+    private Pedidos pedidoActual;
+
+    public AgregarPedidosView(PedidosService pedidosService) {
+        this.pedidosService = pedidosService;
+        this.pedidoActual = new Pedidos();
+
+        HorizontalLayout topLayout = new HorizontalLayout();
+        TextField txtNombreCliente = new TextField("Nombre del cliente");
+        ComboBox<String> cmbPrioridad = new ComboBox<>("Prioridad");
+        HorizontalLayout secondLayout = new HorizontalLayout();
+        Button btnGuardarPedido = new Button("Guardar pedido");
+        HorizontalLayout thirdLayout = new HorizontalLayout();
+        ComboBox<String> cmbArticulo = new ComboBox<>("Artículo");
+        NumberField txtCantidad = new NumberField("Cantidad");
+        Button btnAgregarArticulo = new Button("Agregar artículo");
+        Grid<Map.Entry<String, Integer>> basicGrid = new Grid<>();
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        layoutRow.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.getStyle().set("flex-grow", "1");
-        layoutRow.setAlignItems(Alignment.END);
-        layoutRow.setJustifyContentMode(JustifyContentMode.START);
 
-        textField.setLabel("Nombre del cliente");
-        textField.setWidth("min-content");
+        // primer layout
+        topLayout.setWidthFull();
+        getContent().setFlexGrow(1.0, topLayout);
+        topLayout.addClassName(Gap.MEDIUM);
+        topLayout.setAlignItems(Alignment.END);
+        topLayout.setJustifyContentMode(JustifyContentMode.START);
+        topLayout.setFlexGrow(1.0, secondLayout);
+        // fin del primer layout
 
-        comboBox.setLabel("Prioridad");
-        comboBox.setWidth("min-content");
-        setPriority(comboBox);
+        // ComboBox prioridad
+        cmbPrioridad.setWidth("min-content");
+        cmbPrioridad.setItems("Urgente", "Normal");
+        // fin del ComboBox prioridad
 
-        comboBox2.setLabel("Articulo");
-        comboBox2.setWidth("min-content");
-        setArticulo(comboBox2);
+        // TextField nombre del cliente
+        txtNombreCliente.setWidth("min-content");
+        // fin del TextField nombre del cliente
 
-        numberField.setLabel("Cantidad");
-        numberField.setWidth("min-content");
+        // segundo layout
+        secondLayout.setHeightFull();
+        secondLayout.addClassName(Gap.MEDIUM);
+        secondLayout.setWidth("100%");
+        secondLayout.getStyle().set("flex-grow", "1");
+        secondLayout.setAlignItems(Alignment.START);
+        secondLayout.setJustifyContentMode(JustifyContentMode.END);
+        // fin del segundo layout
 
-        buttonSecondary.setText("Agregar");
-        buttonSecondary.setWidth("min-content");
+        // tercer layout
+        thirdLayout.setWidthFull();
+        getContent().setFlexGrow(1.0, thirdLayout);
+        thirdLayout.addClassName(Gap.MEDIUM);
+        thirdLayout.setWidth("100%");
+        thirdLayout.setHeight("min-content");
+        thirdLayout.setAlignItems(Alignment.END);
+        thirdLayout.setJustifyContentMode(JustifyContentMode.START);
+        // fin del tercer layout
 
-        layoutRow2.setHeightFull();
-        layoutRow.setFlexGrow(1.0, layoutRow2);
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.getStyle().set("flex-grow", "1");
-        layoutRow2.setAlignItems(Alignment.START);
-        layoutRow2.setJustifyContentMode(JustifyContentMode.END);
+        // Boton guardar pedido
+        btnGuardarPedido.setWidth("min-content");
+        btnGuardarPedido.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnGuardarPedido.addClickListener(e -> {
+            if (txtNombreCliente.isEmpty()) {
+                Notification.show("Ingrese el nombre del cliente.");
+                return;
+            }
 
-        buttonPrimary.setText("Finalizar pedido");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            if (cmbPrioridad.isEmpty()) {
+                Notification.show("Seleccione una prioridad.");
+                return;
+            }
 
+            if (pedidoActual.getArticulos().isEmpty()) {
+                Notification.show("Agregue al menos un artículo.");
+                return;
+            }
+
+            pedidoActual.setCliente(txtNombreCliente.getValue());
+            pedidoActual.setPrioridad(cmbPrioridad.getValue());
+            pedidoActual.setEstado("Pendiente");
+
+            pedidosService.agregarPedido(pedidoActual);
+            Notification.show("Pedido guardado exitosamente.");
+            UI.getCurrent().navigate("Pedidos");
+        });
+        // fin del boton guardar pedido
+
+        // ComboBox articulo
+        cmbArticulo.setWidth("min-content");
+        cmbArticulo.setItems("Leche", "Pan", "Huevos", "Queso", "Jamon", "Yogurt");
+        // fin del ComboBox articulo
+
+        // NumberField cantidad
+        txtCantidad.setWidth("min-content");
+        txtCantidad.setMin(1);
+        txtCantidad.setValue(1.0);
+        // fin del NumberField cantidad
+
+        // Boton agregar articulo
+        btnAgregarArticulo.setWidth("min-content");
+        btnAgregarArticulo.getStyle().set("cursor", "pointer");
+        btnAgregarArticulo.addClickListener(e -> {
+            String articulo = cmbArticulo.getValue();
+            Double cantidad = txtCantidad.getValue();
+
+            if (articulo != null && cantidad != null && cantidad > 0) {
+                pedidoActual.getArticulos().put(articulo, cantidad.intValue());
+                basicGrid.setItems(pedidoActual.getArticulos().entrySet());
+                Notification.show(articulo + " agregado.");
+            } else {
+                Notification.show("Selecciona un artículo y cantidad válida.");
+            }
+        });
+        // fin del boton agregar articulo
+
+        // Grid basico
         basicGrid.setWidth("100%");
         basicGrid.getStyle().set("flex-grow", "0");
-        setGridSampleData(basicGrid);
+        basicGrid.addColumn(Map.Entry::getKey).setHeader("Artículo");
+        basicGrid.addColumn(Map.Entry::getValue).setHeader("Cantidad");
+        // fin del Grid basico
 
-        getContent().add(layoutRow);
-        layoutRow.add(textField);
-        layoutRow.add(comboBox);
-        layoutRow.add(comboBox2);
-        layoutRow.add(numberField);
-        layoutRow.add(buttonSecondary);
-        layoutRow.add(layoutRow2);
-        layoutRow2.add(buttonPrimary);
+        getContent().add(topLayout);
+        topLayout.add(txtNombreCliente);
+        topLayout.add(cmbPrioridad);
+        topLayout.add(secondLayout);
+        secondLayout.add(btnGuardarPedido);
+        getContent().add(thirdLayout);
+        thirdLayout.add(cmbArticulo);
+        thirdLayout.add(txtCantidad);
+        thirdLayout.add(btnAgregarArticulo);
         getContent().add(basicGrid);
-    }
-
-    record SampleItem(String value, String label, Boolean disabled) {
-    }
-
-    private void setPriority(ComboBox comboBox) {
-        List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("Urgente", "Urgente", null));
-        sampleItems.add(new SampleItem("Normal", "Normal", null));
-        sampleItems.add(new SampleItem("Baja", "Baja", null));
-        comboBox.setItems(sampleItems);
-        comboBox.setItemLabelGenerator(item -> ((SampleItem) item).label());
-    }
-
-    private void setArticulo(ComboBox comboBox2) {
-        List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("Leche", "Leche", null));
-        sampleItems.add(new SampleItem("Pan", "Pan", null));
-        sampleItems.add(new SampleItem("Huevos", "Huevos", null));
-        comboBox2.setItems(sampleItems);
-        comboBox2.setItemLabelGenerator(item -> ((SampleItem) item).label());
-    }
-
-    private void setGridSampleData(Grid grid) {
 
     }
-
-    @Autowired()
-    private PedidosService pedidosService;
 }

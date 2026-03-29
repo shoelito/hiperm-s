@@ -61,7 +61,7 @@ public class PedidosService {
             todos.addAll(colaNormales);
             todos.addAll(historialAtendidos);
 
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, todos);
+            // objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, todos);
         } catch (Exception e) {
             e.printStackTrace();
         }
