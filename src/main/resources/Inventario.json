@@ -1,0 +1,50 @@
+[
+  {
+    "Codigo": "001",
+    "Nombre": "Leche",
+    "Categoria": "Lacteos",
+    "Stock": 2,
+    "Precio": 1000,
+    "StockCritico": 5
+  },
+  {
+    "Codigo": "002",
+    "Nombre": "Queso",
+    "Categoria": "Lacteos",
+    "Stock": 3,
+    "Precio": 1000,
+    "StockCritico": 5
+  },
+  {
+    "Codigo": "003",
+    "Nombre": "Jamon",
+    "Categoria": "Carnes",
+    "Stock": 2,
+    "Precio": 1000,
+    "StockCritico": 5
+  },
+  {
+    "Codigo": "004",
+    "Nombre": "Pan",
+    "Categoria": "Panaderia",
+    "Stock": 1,
+    "Precio": 1000,
+    "StockCritico": 5
+  },
+  {
+    "Codigo": "005",
+    "Nombre": "Yogurt",
+    "Categoria": "Lacteos",
+    "Stock": 12,
+    "Precio": 1000,
+    "StockCritico": 5
+  },
+  {
+    "Codigo": "006",
+    "Nombre": "Carne",
+    "Categoria": "Carnes",
+    "Stock": 1,
+    "Precio": 1000,
+    "StockCritico": 5
+  }
+]

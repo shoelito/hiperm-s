@@ -30,6 +30,28 @@ import java.util.Map;
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
     private final PedidosService pedidosService;
+
+    /**
+     * @return the pedidosService
+     */
+    public PedidosService getPedidosService() {
+        return pedidosService;
+    }
+
+    /**
+     * @return the pedidoActual
+     */
+    public Pedidos getPedidoActual() {
+        return pedidoActual;
+    }
+
+    /**
+     * @param pedidoActual the pedidoActual to set
+     */
+    public void setPedidoActual(Pedidos pedidoActual) {
+        this.pedidoActual = pedidoActual;
+    }
+
     private Pedidos pedidoActual;
 
     public AgregarPedidosView(PedidosService pedidosService) {
