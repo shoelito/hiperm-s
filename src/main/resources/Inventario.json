@@ -12,7 +12,7 @@
     "Nombre": "Queso",
     "Categoria": "Lacteos",
     "Stock": 3,
-    "Precio": 1000,
+    "Precio": 2500,
     "StockCritico": 5
   },
   {
@@ -28,7 +28,7 @@
     "Nombre": "Pan",
     "Categoria": "Panaderia",
     "Stock": 1,
-    "Precio": 1000,
+    "Precio": 500,
     "StockCritico": 5
   },
   {
@@ -36,7 +36,7 @@
     "Nombre": "Yogurt",
     "Categoria": "Lacteos",
     "Stock": 12,
-    "Precio": 1000,
+    "Precio": 1500,
     "StockCritico": 5
   },
   {
@@ -44,7 +44,7 @@
     "Nombre": "Carne",
     "Categoria": "Carnes",
     "Stock": 1,
-    "Precio": 1000,
+    "Precio": 10000,
     "StockCritico": 5
   }
 ]

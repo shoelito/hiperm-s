@@ -1,12 +1,11 @@
 package com.example.application.views.inventario;
 
-import com.example.application.data.Pedidos;
-import com.example.application.services.PedidosService;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,18 +13,23 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import com.example.application.data.Inventario;
+import com.example.application.services.InventarioService;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+import com.example.application.views.MainLayout;
 
 @PageTitle("Inventario")
-@Route("Inventario")
+@Route(value = "Inventario", layout = MainLayout.class)
 @Menu(order = 2, icon = LineAwesomeIconUrl.STORE_SOLID)
 @Uses(Icon.class)
 public class InventarioView extends Composite<VerticalLayout> {
 
-    public InventarioView() {
+    private InventarioService inventarioService;
+
+    public InventarioView(InventarioService inventarioService) {
+        this.inventarioService = inventarioService;
         HorizontalLayout firstLayout = new HorizontalLayout();
         TextField txtNombreProducto = new TextField();
         HorizontalLayout secondLayout = new HorizontalLayout();
@@ -39,7 +43,7 @@ public class InventarioView extends Composite<VerticalLayout> {
         HorizontalLayout fourthLayout = new HorizontalLayout();
         HorizontalLayout fifthLayout = new HorizontalLayout();
         VerticalLayout layoutColumn4 = new VerticalLayout();
-        Grid basicGrid = new Grid(Pedidos.class);
+        Grid<Inventario> basicGrid = new Grid<>();
 
         // Configuración del layout principal
         getContent().setWidth("100%");
@@ -114,6 +118,24 @@ public class InventarioView extends Composite<VerticalLayout> {
         layoutColumn4.getStyle().set("flex-grow", "1");
 
         // Configuración de la tabla
+        basicGrid.addColumn(Inventario::getCodigo).setHeader("Codigo");
+        basicGrid.addColumn(Inventario::getNombre).setHeader("Nombre");
+        basicGrid.addColumn(Inventario::getCategoria).setHeader("Categoria");
+        basicGrid.addComponentColumn(producto -> {
+            Span textoStock = new Span(String.valueOf(producto.getStock()));
+
+            // Definimos el límite crítico (ejemplo: 5 unidades)
+            if (producto.getStock() <= 5) {
+                // Usamos el color rojo oficial del tema Lumo para errores/alertas
+                textoStock.getStyle().set("color", "var(--lumo-error-text-color)");
+                textoStock.getStyle().set("font-weight", "bold");
+            }
+
+            return textoStock;
+        }).setHeader("Stock").setSortable(true).setComparator(Inventario::getStock);
+
+        basicGrid.addColumn(Inventario::getPrecio).setHeader("Precio");
+        basicGrid.addColumn(Inventario::getStockCritico).setHeader("Stock Critico");
         basicGrid.setWidth("100%");
         basicGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(basicGrid);
@@ -136,10 +158,7 @@ public class InventarioView extends Composite<VerticalLayout> {
 
     }
 
-    private void setGridSampleData(Grid grid) {
-
+    private void setGridSampleData(Grid<Inventario> grid) {
+        grid.setItems(inventarioService.obtenerCatalogoCompleto());
     }
-
-    @Autowired()
-    private PedidosService pedidosService;
 }
