@@ -6,7 +6,7 @@ public class Inventario {
     private String Nombre;
     private String Categoria;
     private int Stock;
-    private double Precio;
+    private int Precio;
     private int StockCritico;
 
     // Getters y Setters
@@ -42,11 +42,11 @@ public class Inventario {
         this.Stock = Stock;
     }
 
-    public double getPrecio() {
+    public int getPrecio() {
         return Precio;
     }
 
-    public void setPrecio(double Precio) {
+    public void setPrecio(int Precio) {
         this.Precio = Precio;
     }
 

@@ -1,6 +1,7 @@
 package com.example.application.views.inventario;
 
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
@@ -16,20 +17,24 @@ import com.vaadin.flow.router.Route;
 import com.example.application.data.Inventario;
 import com.example.application.services.InventarioService;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import com.example.application.views.MainLayout;
+import com.example.application.views.agregarproducto.AgregarProductoView;
 
 @PageTitle("Inventario")
 @Route(value = "Inventario", layout = MainLayout.class)
 @Menu(order = 2, icon = LineAwesomeIconUrl.STORE_SOLID)
 @Uses(Icon.class)
+
 public class InventarioView extends Composite<VerticalLayout> {
 
     private InventarioService inventarioService;
 
     public InventarioView(InventarioService inventarioService) {
         this.inventarioService = inventarioService;
+
         HorizontalLayout firstLayout = new HorizontalLayout();
         TextField txtNombreProducto = new TextField();
         HorizontalLayout secondLayout = new HorizontalLayout();
@@ -40,6 +45,7 @@ public class InventarioView extends Composite<VerticalLayout> {
         Button btnBuscar = new Button();
         Button btnStockCritico = new Button();
         Button btnAgregarProducto = new Button();
+        Button btnLimpiarFiltros = new Button("Limpiar");
         HorizontalLayout fourthLayout = new HorizontalLayout();
         HorizontalLayout fifthLayout = new HorizontalLayout();
         VerticalLayout layoutColumn4 = new VerticalLayout();
@@ -89,13 +95,42 @@ public class InventarioView extends Composite<VerticalLayout> {
         layoutColumn3.getStyle().set("flex-grow", "1");
 
         // Configuración de los botones
-        btnBuscar.setText("buscar");
+        btnBuscar.setText("Buscar");
         btnBuscar.setWidth("min-content");
+        btnBuscar.addClickListener(e -> {
+            String nombreABuscar = txtNombreProducto.getValue().trim().toLowerCase();
+            String codigoABuscar = txtCodigoProducto.getValue().trim().toLowerCase();
+
+            // Filtramos la lista completa basándonos en los TextFields
+            List<Inventario> filtrados = inventarioService.obtenerCatalogoCompleto().stream()
+                    .filter(p -> (nombreABuscar.isEmpty() || p.getNombre().toLowerCase().contains(nombreABuscar)) &&
+                            (codigoABuscar.isEmpty()
+                                    || String.valueOf(p.getCodigo()).toLowerCase().contains(codigoABuscar)))
+                    .toList();
+
+            basicGrid.setItems(filtrados);
+        });
+
+        btnLimpiarFiltros.setText("Limpiar");
+        btnLimpiarFiltros.setWidth("min-content");
+        btnLimpiarFiltros.addClickListener(e -> {
+            txtNombreProducto.clear();
+            txtCodigoProducto.clear();
+            basicGrid.setItems(inventarioService.obtenerCatalogoCompleto());
+        });
+
         btnStockCritico.setText("Stock critico");
         btnStockCritico.setWidth("min-content");
-        btnAgregarProducto.setText("Agregar producto");
+        btnStockCritico.addClickListener(e -> {
+            basicGrid.setItems(inventarioService.obtenerTop10BajoStock());
+        });
+
+        btnAgregarProducto.setText("Agregar o actualizar producto");
         btnAgregarProducto.setWidth("min-content");
         btnAgregarProducto.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnAgregarProducto.addClickListener(e -> {
+            UI.getCurrent().navigate(AgregarProductoView.class);
+        });
 
         // Configuración del cuarto layout
         fourthLayout.setWidthFull();
@@ -124,9 +159,7 @@ public class InventarioView extends Composite<VerticalLayout> {
         basicGrid.addComponentColumn(producto -> {
             Span textoStock = new Span(String.valueOf(producto.getStock()));
 
-            // Definimos el límite crítico (ejemplo: 5 unidades)
-            if (producto.getStock() <= 5) {
-                // Usamos el color rojo oficial del tema Lumo para errores/alertas
+            if (producto.getStock() <= producto.getStockCritico()) {
                 textoStock.getStyle().set("color", "var(--lumo-error-text-color)");
                 textoStock.getStyle().set("font-weight", "bold");
             }
@@ -149,6 +182,7 @@ public class InventarioView extends Composite<VerticalLayout> {
         thirdLayout.add(layoutColumn2);
         layoutColumn2.add(layoutColumn3);
         layoutColumn3.add(btnBuscar);
+        secondLayout.add(btnLimpiarFiltros);
         secondLayout.add(btnStockCritico);
         firstLayout.add(btnAgregarProducto);
         getContent().add(fourthLayout);

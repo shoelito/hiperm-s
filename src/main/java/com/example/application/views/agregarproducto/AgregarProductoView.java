@@ -1,135 +1,279 @@
 package com.example.application.views.agregarproducto;
 
-import com.example.application.components.pricefield.PriceField;
+import com.example.application.data.Inventario;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.example.application.services.InventarioService;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Agregar Producto")
 @Route("Agregar-producto")
-// @Menu(order = 3, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
+
 public class AgregarProductoView extends Composite<VerticalLayout> {
 
-    public AgregarProductoView() {
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        TextField textField = new TextField();
+    private final InventarioService inventarioService;
+    private boolean nuevoProducto;
+
+    public AgregarProductoView(InventarioService inventarioService) {
+        this.inventarioService = inventarioService;
+
+        // Definicion de componentes
+        Icon lupa = VaadinIcon.SEARCH.create();
+        HorizontalLayout firsLayout = new HorizontalLayout();
+        TextField txtCodigoProducto = new TextField();
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        Button buttonPrimary = new Button();
+        Button btnLupa = new Button();
         Span badge = new Span();
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        TextField textField2 = new TextField();
-        ComboBox comboBox = new ComboBox();
-        PriceField price = new PriceField();
-        HorizontalLayout layoutRow3 = new HorizontalLayout();
-        NumberField numberField = new NumberField();
-        NumberField numberField2 = new NumberField();
+        HorizontalLayout secondLayout = new HorizontalLayout();
+        TextField txtNombreProducto = new TextField();
+        ComboBox<SampleItem> cmbCategoria = new ComboBox<>();
+        TextField txtPrecio = new TextField();
+        HorizontalLayout thirdLayout = new HorizontalLayout();
+        TextField txtNuevoStock = new TextField();
+        TextField txtStockCritico = new TextField();
         VerticalLayout layoutColumn3 = new VerticalLayout();
-        HorizontalLayout layoutRow4 = new HorizontalLayout();
-        Button buttonPrimary2 = new Button();
-        Button buttonSecondary = new Button();
+        HorizontalLayout fourthLayout = new HorizontalLayout();
+        Button btnGuardar = new Button();
+        Button btnCancelar = new Button();
+
+        nuevoProducto = true;
+
+        TextArea txtDescripcion = new TextArea();
+        txtDescripcion.setLabel("Descripcion");
+        txtDescripcion.setWidth("100%");
+        txtDescripcion.setHeight("60px");
+        txtDescripcion.setEnabled(false);
+        txtDescripcion.setValue("Descripcion del producto");
+
+        // Layout principal
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        layoutRow.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.getStyle().set("flex-grow", "1");
-        textField.setLabel("Codigo del producto");
-        textField.setWidth("min-content");
+
+        // primer layout
+        firsLayout.setWidthFull();
+        getContent().setFlexGrow(1.0, firsLayout);
+        firsLayout.addClassName(Gap.MEDIUM);
+        firsLayout.setWidth("100%");
+        firsLayout.getStyle().set("flex-grow", "1");
+        firsLayout.setFlexGrow(1.0, layoutColumn2);
+
+        // textfield codigo del producto
+        txtCodigoProducto.setLabel("Codigo del producto");
+        txtCodigoProducto.setWidth("min-content");
+        txtCodigoProducto.setPlaceholder("Codigo del producto");
+
+        // layout column 2
         layoutColumn2.setHeightFull();
-        layoutRow.setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.addClassName(Gap.LARGE);
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
         layoutColumn2.setJustifyContentMode(JustifyContentMode.END);
         layoutColumn2.setAlignItems(Alignment.CENTER);
-        buttonPrimary.setText("Lupa");
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.START, buttonPrimary);
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        badge.setText("Si el producto ya existe, el stock nuevo se adiciona al ya existente");
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.START, btnLupa);
+
+        // boton lupa
+        btnLupa.setIcon(lupa);
+        btnLupa.setWidth("min-content");
+        btnLupa.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnLupa.addClickListener(e -> {
+            if (txtCodigoProducto.isEmpty()) {
+                Notification.show("Ingrese el codigo del producto");
+                return;
+            }
+
+            Inventario producto = inventarioService.buscarProducto(Long.parseLong(txtCodigoProducto.getValue()));
+
+            if (producto != null) {
+                txtCodigoProducto.setEnabled(false);
+                txtNombreProducto.setValue(producto.getNombre());
+                cmbCategoria.setValue(new SampleItem(producto.getCategoria(), producto.getCategoria(), null));
+                txtPrecio.setValue(String.valueOf(producto.getPrecio()));
+                txtPrecio.setEnabled(true);
+
+                txtStockCritico.setEnabled(true);
+
+                txtStockCritico.setValue(String.valueOf(producto.getStockCritico()));
+                txtStockCritico.setEnabled(true);
+
+                btnGuardar.setEnabled(true);
+                nuevoProducto = false;
+                return;
+            }
+            txtNombreProducto.setEnabled(true);
+            cmbCategoria.setEnabled(true);
+            txtPrecio.setEnabled(true);
+            txtNuevoStock.setEnabled(true);
+            txtStockCritico.setEnabled(true);
+            btnGuardar.setEnabled(true);
+
+        });
+
+        // badge
+        badge.setText("Si es producto existente, el stock se suma al stock actual");
         badge.setWidth("100%");
         badge.getElement().getThemeList().add("badge");
-        layoutRow2.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow2);
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.getStyle().set("flex-grow", "1");
-        textField2.setLabel("Nombre del producto");
-        textField2.setWidth("min-content");
-        textField2.setHeight("60px");
-        comboBox.setLabel("Categoria");
-        comboBox.setWidth("min-content");
-        comboBox.setHeight("60px");
-        setComboBoxSampleData(comboBox);
-        price.setLabel("Precio");
-        price.setWidth("min-content");
-        layoutRow3.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow3);
-        layoutRow3.addClassName(Gap.MEDIUM);
-        layoutRow3.setWidth("100%");
-        layoutRow3.getStyle().set("flex-grow", "1");
-        numberField.setLabel("Stock nuevo");
-        numberField.setWidth("min-content");
-        numberField2.setLabel("Stock Critico");
-        numberField2.setWidth("min-content");
+
+        // segundo layout
+        secondLayout.setWidthFull();
+        getContent().setFlexGrow(1.0, secondLayout);
+        secondLayout.addClassName(Gap.MEDIUM);
+        secondLayout.setWidth("100%");
+        secondLayout.getStyle().set("flex-grow", "1");
+
+        // textfield nombre del producto
+        txtNombreProducto.setLabel("Nombre del producto");
+        txtNombreProducto.setWidth("min-content");
+        txtNombreProducto.setHeight("60px");
+        txtNombreProducto.setEnabled(false);
+        txtNombreProducto.setPlaceholder("Nombre del producto");
+
+        // combobox categoria
+        cmbCategoria.setLabel("Categoria");
+        cmbCategoria.setWidth("min-content");
+        cmbCategoria.setHeight("60px");
+        cmbCategoria.setEnabled(false);
+        setComboBoxSampleData(cmbCategoria);
+        cmbCategoria.setPlaceholder("Seleccione una categoria");
+
+        // textfield precio
+        txtPrecio.setLabel("Precio");
+        txtPrecio.setWidth("min-content");
+        txtPrecio.setEnabled(false);
+        txtPrecio.setPlaceholder("Precio del producto");
+
+        // tercer layout
+        thirdLayout.setWidthFull();
+        getContent().setFlexGrow(1.0, thirdLayout);
+        thirdLayout.addClassName(Gap.MEDIUM);
+        thirdLayout.setWidth("100%");
+        thirdLayout.getStyle().set("flex-grow", "1");
+
+        // textfield stock nuevo
+        txtNuevoStock.setLabel("Stock nuevo");
+        txtNuevoStock.setWidth("min-content");
+        txtNuevoStock.setEnabled(false);
+        txtNuevoStock.setPlaceholder("Ingrese el stock nuevo");
+
+        // textfield stock critico
+        txtStockCritico.setLabel("Stock Critico");
+        txtStockCritico.setWidth("min-content");
+        txtStockCritico.setEnabled(false);
+        txtStockCritico.setPlaceholder("Ingrese el stock critico");
+
+        // layout column 3
         layoutColumn3.setWidthFull();
         getContent().setFlexGrow(1.0, layoutColumn3);
         layoutColumn3.setWidth("100%");
         layoutColumn3.getStyle().set("flex-grow", "1");
-        layoutRow4.setWidthFull();
-        layoutColumn3.setFlexGrow(1.0, layoutRow4);
-        layoutRow4.addClassName(Gap.MEDIUM);
-        layoutRow4.setWidth("100%");
-        layoutRow4.getStyle().set("flex-grow", "1");
-        buttonPrimary2.setText("Guardar");
-        buttonPrimary2.setWidth("min-content");
-        buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonSecondary.setText("Cancelar");
-        buttonSecondary.setWidth("min-content");
-        getContent().add(layoutRow);
-        layoutRow.add(textField);
-        layoutRow.add(layoutColumn2);
-        layoutColumn2.add(buttonPrimary);
+
+        // fourth layout
+        fourthLayout.setWidthFull();
+        layoutColumn3.setFlexGrow(1.0, fourthLayout);
+        fourthLayout.addClassName(Gap.MEDIUM);
+        fourthLayout.setWidth("100%");
+        fourthLayout.getStyle().set("flex-grow", "1");
+
+        // boton guardar
+        btnGuardar.setText("Guardar");
+        btnGuardar.setWidth("min-content");
+        btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnGuardar.setEnabled(false);
+        btnGuardar.addClickListener(e -> {
+            if (txtNombreProducto.isEmpty() || cmbCategoria.isEmpty() || txtPrecio.isEmpty() || txtNuevoStock.isEmpty()
+                    || txtStockCritico.isEmpty()) {
+                Notification.show("Complete todos los campos");
+                return;
+            }
+
+            Inventario producto = new Inventario();
+
+            producto.setCodigo(Long.valueOf(txtCodigoProducto.getValue()));
+            producto.setNombre(txtNombreProducto.getValue());
+            producto.setCategoria(cmbCategoria.getValue().value());
+
+            try {
+                producto.setPrecio(Integer.parseInt(txtPrecio.getValue()));
+                producto.setStock(Integer.parseInt(txtNuevoStock.getValue()));
+                producto.setStockCritico(Integer.parseInt(txtStockCritico.getValue()));
+            } catch (Exception i) {
+                Notification.show("Ingrese solo numeros en los campos de precio, stock y stock critico");
+                return;
+            }
+
+            if (nuevoProducto) {
+                inventarioService.registrarNuevoProducto(producto);
+                Notification.show("Producto guardado exitosamente");
+                UI.getCurrent().navigate("Inventario");
+            } else {
+                inventarioService.actualizarStock(producto.getCodigo(), producto.getStock(), "Actualizacion");
+                Notification.show("Producto actualizado exitosamente");
+                UI.getCurrent().navigate("Inventario");
+            }
+        });
+
+        // boton cancelar
+        btnCancelar.setText("Cancelar");
+        btnCancelar.setWidth("min-content");
+        btnCancelar.addClickListener(e -> {
+            UI.getCurrent().navigate("Inventario");
+        });
+
+        // agregar componentes al layout
+        getContent().add(firsLayout);
+        firsLayout.add(txtCodigoProducto);
+        firsLayout.add(layoutColumn2);
+        layoutColumn2.add(btnLupa);
         getContent().add(badge);
-        getContent().add(layoutRow2);
-        layoutRow2.add(textField2);
-        layoutRow2.add(comboBox);
-        layoutRow2.add(price);
-        getContent().add(layoutRow3);
-        layoutRow3.add(numberField);
-        layoutRow3.add(numberField2);
+        getContent().add(secondLayout);
+        secondLayout.add(txtNombreProducto);
+        secondLayout.add(cmbCategoria);
+        secondLayout.add(txtPrecio);
+        getContent().add(thirdLayout);
+        thirdLayout.add(txtNuevoStock);
+        thirdLayout.add(txtStockCritico);
         getContent().add(layoutColumn3);
-        layoutColumn3.add(layoutRow4);
-        layoutRow4.add(buttonPrimary2);
-        layoutRow4.add(buttonSecondary);
+        layoutColumn3.add(fourthLayout);
+        fourthLayout.add(btnGuardar);
+        fourthLayout.add(btnCancelar);
+        // layoutColumn3.add(txtDescripcion);
     }
 
     record SampleItem(String value, String label, Boolean disabled) {
     }
 
-    private void setComboBoxSampleData(ComboBox comboBox) {
+    private void setComboBoxSampleData(ComboBox<SampleItem> comboBox) {
         List<SampleItem> sampleItems = new ArrayList<>();
-        sampleItems.add(new SampleItem("first", "First", null));
-        sampleItems.add(new SampleItem("second", "Second", null));
-        sampleItems.add(new SampleItem("third", "Third", Boolean.TRUE));
-        sampleItems.add(new SampleItem("fourth", "Fourth", null));
+        sampleItems.add(new SampleItem("Abarrotes", "Abarrotes", null));
+        sampleItems.add(new SampleItem("Carnes", "Carnes", null));
+        sampleItems.add(new SampleItem("Verduras", "Verduras", null));
+        sampleItems.add(new SampleItem("Frutas", "Frutas", null));
+        sampleItems.add(new SampleItem("Bebidas", "Bebidas", null));
+        sampleItems.add(new SampleItem("Limpieza", "Limpieza", null));
+        sampleItems.add(new SampleItem("Lacteos", "Lacteos", null));
+        sampleItems.add(new SampleItem("Panaderia", "Panaderia", null));
+        sampleItems.add(new SampleItem("Congelados", "Congelados", null));
+        sampleItems.add(new SampleItem("Otros", "Otros", null));
+
         comboBox.setItems(sampleItems);
         comboBox.setItemLabelGenerator(item -> ((SampleItem) item).label());
     }

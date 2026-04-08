@@ -7,13 +7,13 @@ public class Movimiento {
     private String fechaHora;
     private Long codigoProducto;
     private String tipo; // "ENTRADA", "SALIDA", o "AJUSTE"
-    private int cantidad;
+    private double cantidad;
     private String motivo;
 
     public Movimiento() {
     }
 
-    public Movimiento(Long codigoProducto, String tipo, int cantidad, String motivo) {
+    public Movimiento(Long codigoProducto, String tipo, double cantidad, String motivo) {
         this.codigoProducto = codigoProducto;
         this.tipo = tipo;
         this.cantidad = cantidad;
@@ -46,11 +46,11 @@ public class Movimiento {
         this.tipo = tipo;
     }
 
-    public int getCantidad() {
+    public double getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(double cantidad) {
         this.cantidad = cantidad;
     }
 

@@ -11,7 +11,7 @@ public class PriceField extends CustomField<PriceField.Price> implements HasSize
     public record Price(Double amount, String currency) {
     };
 
-    private String[] currencies = new String[]{"EUR", "USD", "PLN"};
+    private String[] currencies = new String[] { "CRC" };
 
     private Select<String> currency;
 
@@ -22,7 +22,7 @@ public class PriceField extends CustomField<PriceField.Price> implements HasSize
         horizontalLayout.setSpacing(true);
 
         amount = new NumberField();
-        amount.setPlaceholder("Amount");
+        amount.setPlaceholder("Precio");
 
         currency = new Select<>();
         currency.setItems(currencies);

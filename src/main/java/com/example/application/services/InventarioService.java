@@ -19,7 +19,7 @@ public class InventarioService {
     private TreeMap<Long, Inventario> catalogoMain = new TreeMap<>();
 
     private TreeSet<Inventario> rankingBajoStock = new TreeSet<>(
-            Comparator.comparingInt(Inventario::getStock)
+            Comparator.comparingDouble(Inventario::getStock)
                     .thenComparing(Inventario::getCodigo));
 
     private ArrayList<Movimiento> historialMovimientos = new ArrayList<>();
@@ -53,8 +53,7 @@ public class InventarioService {
 
     private void guardarDatos() {
         try {
-            // objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson,
-            // catalogoMain.values());
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, catalogoMain.values());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +67,8 @@ public class InventarioService {
             catalogoMain.put(producto.getCodigo(), producto);
             rankingBajoStock.add(producto);
 
-            registrarMovimiento(producto.getCodigo(), "ENTRADA", producto.getStock(), "Registro Inicial");
+            // registrarMovimiento(producto.getCodigo(), "ENTRADA", producto.getStock(),
+            // "Registro Inicial");
             guardarDatos();
         }
     }
@@ -88,7 +88,7 @@ public class InventarioService {
             rankingBajoStock.add(producto); // Lo re-insertamos para que se reubique en el ranking
 
             // Determinar si es entrada o salida
-            String tipo = variacion > 0 ? "ENTRADA" : "SALIDA";
+            String tipo = variacion > producto.getStock() ? "ENTRADA" : "SALIDA";
             registrarMovimiento(codigo, tipo, Math.abs(variacion), motivo);
 
             guardarDatos();
@@ -98,6 +98,10 @@ public class InventarioService {
     private void registrarMovimiento(Long codigo, String tipo, int cantidad, String motivo) {
         Movimiento mov = new Movimiento(codigo, tipo, cantidad, motivo);
         historialMovimientos.add(mov);
+    }
+
+    public Inventario buscarProducto(Long codigo) {
+        return catalogoMain.get(codigo);
     }
 
     public List<Inventario> obtenerCatalogoCompleto() {
