@@ -1,6 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.Pedidos;
+import com.example.application.data.Inventario;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -15,7 +16,7 @@ import java.util.*;
 public class PedidosService {
 
     private final ObjectMapper objectMapper;
-    private final File archivoJson = new File("src/main/resources/pedidos.json");
+    private final File archivoJson = new File("Data/pedidos.json");
 
     private PriorityQueue<Pedidos> colaUrgentes = new PriorityQueue<Pedidos>(Comparator.comparing(Pedidos::getId));
     private Queue<Pedidos> colaNormales = new LinkedList<>();
@@ -61,7 +62,7 @@ public class PedidosService {
             todos.addAll(colaNormales);
             todos.addAll(historialAtendidos);
 
-            // objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, todos);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(archivoJson, todos);
         } catch (Exception e) {
             e.printStackTrace();
         }

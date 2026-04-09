@@ -14,7 +14,7 @@ import java.util.*;
 public class InventarioService {
 
     private final ObjectMapper objectMapper;
-    private final File archivoJson = new File("src/main/resources/Inventario.json");
+    private final File archivoJson = new File("Data/Inventario.json");
 
     private TreeMap<Long, Inventario> catalogoMain = new TreeMap<>();
 

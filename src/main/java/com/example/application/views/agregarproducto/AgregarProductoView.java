@@ -15,7 +15,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
@@ -51,6 +50,7 @@ public class AgregarProductoView extends Composite<VerticalLayout> {
         HorizontalLayout thirdLayout = new HorizontalLayout();
         TextField txtNuevoStock = new TextField();
         TextField txtStockCritico = new TextField();
+        TextField txtStockActual = new TextField();
         VerticalLayout layoutColumn3 = new VerticalLayout();
         HorizontalLayout fourthLayout = new HorizontalLayout();
         Button btnGuardar = new Button();
@@ -104,11 +104,14 @@ public class AgregarProductoView extends Composite<VerticalLayout> {
             Inventario producto = inventarioService.buscarProducto(Long.parseLong(txtCodigoProducto.getValue()));
 
             if (producto != null) {
-                txtCodigoProducto.setEnabled(false);
                 txtNombreProducto.setValue(producto.getNombre());
                 cmbCategoria.setValue(new SampleItem(producto.getCategoria(), producto.getCategoria(), null));
                 txtPrecio.setValue(String.valueOf(producto.getPrecio()));
                 txtPrecio.setEnabled(true);
+                txtStockActual.setVisible(true);
+                txtStockActual.setValue(String.valueOf(producto.getStock()));
+
+                txtNuevoStock.setEnabled(true);
 
                 txtStockCritico.setEnabled(true);
 
@@ -119,6 +122,14 @@ public class AgregarProductoView extends Composite<VerticalLayout> {
                 nuevoProducto = false;
                 return;
             }
+
+            txtNuevoStock.clear();
+            txtStockCritico.clear();
+            txtPrecio.clear();
+            txtNombreProducto.clear();
+            cmbCategoria.clear();
+
+            txtStockActual.setVisible(false);
             txtNombreProducto.setEnabled(true);
             cmbCategoria.setEnabled(true);
             txtPrecio.setEnabled(true);
@@ -179,6 +190,13 @@ public class AgregarProductoView extends Composite<VerticalLayout> {
         txtStockCritico.setWidth("min-content");
         txtStockCritico.setEnabled(false);
         txtStockCritico.setPlaceholder("Ingrese el stock critico");
+
+        // textfield stock actual
+        txtStockActual.setLabel("Stock actual");
+        txtStockActual.setWidth("min-content");
+        txtStockActual.setEnabled(false);
+        txtStockActual.setVisible(false);
+        txtStockActual.setPlaceholder("Stock actual");
 
         // layout column 3
         layoutColumn3.setWidthFull();
@@ -251,6 +269,7 @@ public class AgregarProductoView extends Composite<VerticalLayout> {
         getContent().add(thirdLayout);
         thirdLayout.add(txtNuevoStock);
         thirdLayout.add(txtStockCritico);
+        thirdLayout.add(txtStockActual);
         getContent().add(layoutColumn3);
         layoutColumn3.add(fourthLayout);
         fourthLayout.add(btnGuardar);

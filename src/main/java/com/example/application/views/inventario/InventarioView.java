@@ -165,7 +165,7 @@ public class InventarioView extends Composite<VerticalLayout> {
             }
 
             return textoStock;
-        }).setHeader("Stock").setSortable(true).setComparator(Inventario::getStock);
+        }).setHeader("Stock").setComparator(Inventario::getStock);
 
         basicGrid.addColumn(Inventario::getPrecio).setHeader("Precio");
         basicGrid.addColumn(Inventario::getStockCritico).setHeader("Stock Critico");

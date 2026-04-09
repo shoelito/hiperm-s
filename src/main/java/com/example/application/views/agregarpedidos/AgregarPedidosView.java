@@ -1,8 +1,11 @@
 package com.example.application.views.agregarpedidos;
 
+import com.example.application.data.Inventario;
 import com.example.application.data.Pedidos;
+import com.example.application.services.InventarioService;
 import com.example.application.services.PedidosService;
 import com.example.application.views.MainLayout;
+import com.example.application.views.pedidos.PedidosView;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -23,6 +26,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
 import java.util.Map;
+import java.util.List;
 
 @PageTitle("Agregar Pedidos")
 @Route(value = "Pedidos/Agregar", layout = MainLayout.class)
@@ -30,6 +34,8 @@ import java.util.Map;
 public class AgregarPedidosView extends Composite<VerticalLayout> {
 
     private final PedidosService pedidosService;
+    private final InventarioService inventarioService;
+    private Pedidos pedidoActual;
 
     /**
      * @return the pedidosService
@@ -52,10 +58,9 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         this.pedidoActual = pedidoActual;
     }
 
-    private Pedidos pedidoActual;
-
-    public AgregarPedidosView(PedidosService pedidosService) {
+    public AgregarPedidosView(PedidosService pedidosService, InventarioService inventarioService) {
         this.pedidosService = pedidosService;
+        this.inventarioService = inventarioService;
         this.pedidoActual = new Pedidos();
 
         HorizontalLayout topLayout = new HorizontalLayout();
@@ -113,34 +118,45 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         btnGuardarPedido.setWidth("min-content");
         btnGuardarPedido.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnGuardarPedido.addClickListener(e -> {
-            if (txtNombreCliente.isEmpty()) {
-                Notification.show("Ingrese el nombre del cliente.");
+            String cliente = txtNombreCliente.getValue();
+            String prioridad = cmbPrioridad.getValue();
+
+            if (cliente == null || cliente.isEmpty() || prioridad == null) {
+                Notification.show("Ingresa el cliente y la prioridad.");
                 return;
             }
-
-            if (cmbPrioridad.isEmpty()) {
-                Notification.show("Seleccione una prioridad.");
-                return;
-            }
-
             if (pedidoActual.getArticulos().isEmpty()) {
-                Notification.show("Agregue al menos un artículo.");
+                Notification.show("El pedido debe tener al menos un artículo.");
                 return;
             }
 
-            pedidoActual.setCliente(txtNombreCliente.getValue());
-            pedidoActual.setPrioridad(cmbPrioridad.getValue());
-            pedidoActual.setEstado("Pendiente");
+            for (Map.Entry<String, Integer> item : pedidoActual.getArticulos().entrySet()) {
+                String nombreProd = item.getKey();
+                int cantidadARestar = item.getValue();
 
+                inventarioService.obtenerCatalogoCompleto().stream()
+                        .filter(p -> p.getNombre().equals(nombreProd))
+                        .findFirst()
+                        .ifPresent(p -> {
+                            inventarioService.actualizarStock(p.getCodigo(), -cantidadARestar,
+                                    "Salida por Pedido de: " + cliente);
+                        });
+            }
+            pedidoActual.setCliente(cliente);
+            pedidoActual.setPrioridad(prioridad);
             pedidosService.agregarPedido(pedidoActual);
-            Notification.show("Pedido guardado exitosamente.");
-            UI.getCurrent().navigate("Pedidos");
+
+            Notification.show("¡Pedido guardado!");
+            UI.getCurrent().navigate(PedidosView.class);
         });
         // fin del boton guardar pedido
 
         // ComboBox articulo
         cmbArticulo.setWidth("min-content");
-        cmbArticulo.setItems("Leche", "Pan", "Huevos", "Queso", "Jamon", "Yogurt");
+        List<String> nombresProductosReales = inventarioService.obtenerCatalogoCompleto().stream()
+                .map(Inventario::getNombre)
+                .toList();
+        cmbArticulo.setItems(nombresProductosReales);
         // fin del ComboBox articulo
 
         // NumberField cantidad
@@ -153,13 +169,35 @@ public class AgregarPedidosView extends Composite<VerticalLayout> {
         btnAgregarArticulo.setWidth("min-content");
         btnAgregarArticulo.getStyle().set("cursor", "pointer");
         btnAgregarArticulo.addClickListener(e -> {
-            String articulo = cmbArticulo.getValue();
-            Double cantidad = txtCantidad.getValue();
+            String articuloNombre = cmbArticulo.getValue();
+            Double cantidadPedidaDouble = txtCantidad.getValue();
 
-            if (articulo != null && cantidad != null && cantidad > 0) {
-                pedidoActual.getArticulos().put(articulo, cantidad.intValue());
-                basicGrid.setItems(pedidoActual.getArticulos().entrySet());
-                Notification.show(articulo + " agregado.");
+            if (articuloNombre != null && cantidadPedidaDouble != null && cantidadPedidaDouble > 0) {
+                int cantidadPedida = cantidadPedidaDouble.intValue();
+
+                Inventario productoReal = inventarioService.obtenerCatalogoCompleto().stream()
+                        .filter(p -> p.getNombre().equals(articuloNombre))
+                        .findFirst()
+                        .orElse(null);
+
+                if (productoReal == null) {
+                    Notification.show("Error: El producto no existe en el inventario.");
+                    return;
+                }
+
+                int cantidadYaEnCarrito = pedidoActual.getArticulos().getOrDefault(articuloNombre, 0);
+                int cantidadTotalRequerida = cantidadYaEnCarrito + cantidadPedida;
+
+                if (cantidadTotalRequerida > productoReal.getStock()) {
+                    Notification
+                            .show("¡Stock insuficiente! Solo hay " + productoReal.getStock() + " de " + articuloNombre);
+                } else {
+                    pedidoActual.getArticulos().put(articuloNombre, cantidadTotalRequerida);
+                    basicGrid.setItems(pedidoActual.getArticulos().entrySet());
+                    Notification.show(articuloNombre + " agregado al pedido.");
+                    cmbArticulo.clear();
+                    txtCantidad.setValue(1.0);
+                }
             } else {
                 Notification.show("Selecciona un artículo y cantidad válida.");
             }

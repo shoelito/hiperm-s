@@ -3,14 +3,14 @@
   "Codigo" : 1,
   "Nombre" : "Leche",
   "Precio" : 1000,
-  "Stock" : 22,
+  "Stock" : 50,
   "StockCritico" : 5
 }, {
   "Categoria" : "Lacteos",
   "Codigo" : 2,
   "Nombre" : "Queso",
   "Precio" : 2500,
-  "Stock" : 33,
+  "Stock" : 26,
   "StockCritico" : 5
 }, {
   "Categoria" : "Carnes",
